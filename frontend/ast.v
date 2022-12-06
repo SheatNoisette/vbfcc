@@ -15,8 +15,6 @@ pub mut:
 	start_loop &BrainfuckASTNode
 	// If it's a loop, end of the loop
 	end_loop &BrainfuckASTNode
-	// Is the node empty
-	empty bool
 }
 
 pub fn (bf &BrainfuckASTNode) get_type() LexerTokenType {
@@ -25,72 +23,109 @@ pub fn (bf &BrainfuckASTNode) get_type() LexerTokenType {
 
 pub fn (ast []&BrainfuckASTNode) print() {
 	for node in ast {
-		println('Node: $node.type_token')
+		println('Node: ${node.type_token}')
 	}
 }
 
-// Parse a Brainfuck program into an AST
-pub fn parse(mut tokens LexerTokenList) []&BrainfuckASTNode {
+// First simple pass to create the AST
+// - Annotations with IDs
+// - Tags (token type) for each node
+// Note: The loops are not resolved yet
+fn parse_first_pass(tokens LexerTokenList) []&BrainfuckASTNode {
 	mut ast := []&BrainfuckASTNode{}
-	mut current_node := &BrainfuckASTNode{}
-	mut loop_stack := []&BrainfuckASTNode{}
-	mut loop_end := []&BrainfuckASTNode{}
-	mut current_id := 0
+	mut id := 0
+	for i := 0; i < tokens.len(); i++ {
+		current_token := tokens.get(i)
 
-	// For every token, get the end of the loop
-	for token in tokens.tokens {
-		if token.token_type == .jump_past {
-			loop_end << current_node
+		// Create a new node
+		mut current_node := &BrainfuckASTNode{
+			id: id
+			type_token: current_token
+			value: 0
+			start_loop: 0
+			end_loop: 0
 		}
-	}
 
-	for tokens.len() > 0 {
-		mut token := tokens.pop()
-		current_node.id = current_id
-		match token.token_type {
-			.increment {
-				current_node.type_token = token
+		match current_token.token_type {
+			.increment, .decrement {
 				current_node.value = 1
 			}
-			.decrement {
-				current_node.type_token = token
+			.pointer_left, .pointer_right {
 				current_node.value = 1
-			}
-			.pointer_left {
-				current_node.type_token = token
-				current_node.value = 1
-			}
-			.pointer_right {
-				current_node.type_token = token
-				current_node.value = 1
-			}
-			.output {
-				current_node.type_token = token
-				current_node.value = 0
-			}
-			.input {
-				current_node.type_token = token
-				current_node.value = 0
-			}
-			.jump_past {
-				current_node.type_token = token
-				current_node.value = 0
-				loop_stack << current_node
-			}
-			.jump_back {
-				current_node.type_token = token
-				current_node.value = 0
-				mut loop_start := loop_stack.pop()
-				loop_start.end_loop = current_node
-				current_node.start_loop = loop_start
 			}
 			else {}
 		}
 		ast << current_node
-		current_node = &BrainfuckASTNode{}
-		current_id++
+		id++
+	}
+	return ast
+}
+
+// From the ast, resolve the loops
+fn resolve_loops(bf []&BrainfuckASTNode) !map[int]int {
+	// Contains the loop start '[' - jump_past
+	mut loop_stack := []int{}
+
+	// Contains the mapping between the start and end of the loop based on ids
+	mut loop_map := map[int]int{}
+
+	for node in bf {
+		match node.get_type() {
+			.jump_back, .jump_past {
+				loop_stack << node.id
+			}
+			else {}
+		}
 	}
 
-	// Return the root node
+	// Check if the stack is divisible by 2
+	if loop_stack.len % 2 != 0 {
+		return error('Unbalanced loops')
+	}
+
+	// Find the middle of the stack
+	mut last := loop_stack.len
+	mut first := 0
+
+	for last != first {
+		// Get the first and last element
+		loop_map[loop_stack[first]] = loop_stack[last - 1]
+		loop_map[loop_stack[last - 1]] = loop_stack[first]
+		last--
+		first++
+	}
+
+	// Add to the map
+	return loop_map
+}
+
+// Parse a Brainfuck program into an AST
+pub fn parse(mut tokens LexerTokenList) ![]&BrainfuckASTNode {
+	mut ast := parse_first_pass(tokens)
+	loops_resolved := resolve_loops(ast) or { return error('Could not resolve loops: ${err}') }
+
+	// Cache the nodes (id -> node)
+	mut nodes := map[int]&BrainfuckASTNode{}
+	for node in ast {
+		nodes[node.id] = node
+	}
+
+	// Resolve the loops
+	for mut node in ast {
+		match node.get_type() {
+			.jump_back {
+				node.start_loop = nodes[loops_resolved[node.id]]
+				node.end_loop = node
+				node.value = loops_resolved[node.id]
+			}
+			.jump_past {
+				node.start_loop = node
+				node.end_loop = nodes[loops_resolved[node.id]]
+				node.value = loops_resolved[node.id]
+			}
+			else {}
+		}
+	}
+
 	return ast
 }

@@ -2,8 +2,7 @@ module frontend
 
 // Simple clang format like for brainfuck
 
-pub fn format_code_from_ast(ast []&BrainfuckASTNode) string
-{
+pub fn format_code_from_ast(ast []&BrainfuckASTNode) string {
 	mut s := ''
 	for node in ast {
 		match node.get_type() {
