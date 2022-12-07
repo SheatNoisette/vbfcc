@@ -4,6 +4,7 @@ import os
 import frontend
 import middle
 import interpreter
+import generators
 
 fn main() {
 	if os.args.len != 2 {
@@ -32,6 +33,8 @@ fn main() {
 		println('(IL) { ${intermediate_code} }')
 		println('(FORMAT IL) { \n${middle.string_il(intermediate_code)}\n}')
 	}
+
+	/*
 	state := interpreter.run(intermediate_code, interpreter.ILInterpreterOptions{
 		memory_size: 128
 		print_direct: true
@@ -40,9 +43,18 @@ fn main() {
 		println('error: could not run file - ${err}')
 		exit(1)
 	}
+	*/
 
-	state.print()
-	$if debug {
-		println('(STATE) { ${state} }')
+	// state.print()
+
+	// Call the code generator
+	generators.generator_call_backend("cgen", generators.CodeGenInterfaceOptions{
+		output_file: "out.c"
+		custom_arguments: {}
+		il: intermediate_code
+		ast: parsed
+	}) or {
+		println('error: could not generate code - ${err}')
+		exit(1)
 	}
 }

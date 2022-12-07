@@ -50,6 +50,8 @@ pub fn run(code []middle.BFILToken, options ILInterpreterOptions) ?ILInterpreter
 		return error('Error: memory size must be greater than 0')
 	}
 
+	// If we use dynamic memory, we only allocate 1 byte of memory, we will
+	// allocate more memory if needed
 	state.memory = match options.dynamic_memory {
 		true {
 			[u8(0)]
