@@ -125,7 +125,5 @@ pub fn parse(mut tokens LexerTokenList) ![]&BrainfuckASTNode {
 		}
 	}
 
-	println('loops resolved: ${loops_resolved}')
-
 	return ast
 }

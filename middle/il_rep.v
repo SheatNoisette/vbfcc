@@ -24,9 +24,10 @@ pub:
 	value_str  string
 }
 
+// Pretty print the BFILToken list into a string
 pub fn string_il(bf []BFILToken) string {
 	mut s := 'main:\n'
-	mut line := 0
+
 	for token in bf {
 		match token.type_token {
 			.add {

@@ -35,6 +35,7 @@ fn main() {
 	state := interpreter.run(intermediate_code, interpreter.ILInterpreterOptions{
 		memory_size: 128
 		print_direct: true
+		dynamic_memory: true
 	}) or {
 		println('error: could not run file - ${err}')
 		exit(1)
