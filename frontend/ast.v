@@ -63,7 +63,7 @@ fn parse_first_pass(tokens LexerTokenList) []&BrainfuckASTNode {
 
 // From the ast, resolve the loops
 fn resolve_loops(bf []&BrainfuckASTNode) !map[int]int {
-	// Contains the loop start '[' - jump_past
+	// Contains the loop start '[' - jump_past / jump_back ']'
 	mut loop_stack := []int{}
 
 	// Contains the mapping between the start and end of the loop based on ids
@@ -113,19 +113,19 @@ pub fn parse(mut tokens LexerTokenList) ![]&BrainfuckASTNode {
 	// Resolve the loops
 	for mut node in ast {
 		match node.get_type() {
+			// ]
 			.jump_back {
 				node.start_loop = nodes[loops_resolved[node.id]]
-				node.end_loop = node
-				node.value = loops_resolved[node.id]
 			}
+			// [
 			.jump_past {
-				node.start_loop = node
 				node.end_loop = nodes[loops_resolved[node.id]]
-				node.value = loops_resolved[node.id]
 			}
 			else {}
 		}
 	}
+
+	println('loops resolved: ${loops_resolved}')
 
 	return ast
 }

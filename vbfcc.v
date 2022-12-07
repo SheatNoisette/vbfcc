@@ -28,7 +28,7 @@ fn main() {
 	intermediate_code := middle.gen_il(parsed)
 	$if debug {
 		println('(PARSED) { ${parsed} }')
-		println('(FORMAT) { ${frontend.format_code_from_ast(parsed)} }')
+		println('(FORMAT) { \n${frontend.format_code_from_ast(parsed)}\n }')
 		println('(IL) { ${intermediate_code} }')
 		println('(FORMAT IL) { \n${middle.string_il(intermediate_code)}\n}')
 	}

@@ -74,19 +74,27 @@ pub fn run(code []middle.BFILToken, options ILInterpreterOptions) ?ILInterpreter
 				if options.print_direct {
 					print(state.memory[state.pointer].ascii_str())
 				}
+				println('OUTOUT')
 			}
 			.input {
 				input := os.get_line()[0].ascii_str()
 				state.memory[state.pointer] = u8(input[0])
+				println('INPUT')
 			}
 			.jump_if_zero {
 				if state.memory[state.pointer] == 0 {
-					state.program_counter = u64(code[state.program_counter].value)
+					state.program_counter = u64(code[state.program_counter].value) + 1
+				}
+				$if debug {
+					println('jump_if_zero:')
 				}
 			}
 			.jump_if_not_zero {
 				if state.memory[state.pointer] != 0 {
-					state.program_counter = u64(code[state.program_counter].value)
+					state.program_counter = u64(code[state.program_counter].value) + 1
+				}
+				$if debug {
+					println('jump_if_not_zero')
 				}
 			}
 			else {}

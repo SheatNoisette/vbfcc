@@ -2,8 +2,10 @@ module frontend
 
 // Simple clang format like for brainfuck
 
+// Format brainfuck code
 pub fn format_code_from_ast(ast []&BrainfuckASTNode) string {
 	mut s := ''
+	mut indentation := 0
 	for node in ast {
 		match node.get_type() {
 			.increment {
@@ -19,15 +21,20 @@ pub fn format_code_from_ast(ast []&BrainfuckASTNode) string {
 				s += '>'
 			}
 			.output {
-				s += '.'
+				s += '.\n'
 			}
 			.input {
-				s += ','
+				s += ',\n'
 			}
 			.jump_past {
-				s += '['
+				s += ' '.repeat(indentation)
+				s += '[\n'
+				indentation++
 			}
 			.jump_back {
+				indentation--
+				s += '\n'
+				s += ' '.repeat(indentation)
 				s += ']'
 			}
 			else {
