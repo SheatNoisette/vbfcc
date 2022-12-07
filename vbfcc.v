@@ -26,7 +26,8 @@ fn main() {
 		println('error: could not parse file - ${err}')
 		exit(1)
 	}
-	intermediate_code := middle.gen_il(parsed)
+	mut intermediate_code := middle.gen_il(parsed)
+	middle.optimize_il(mut intermediate_code)
 	$if debug {
 		println('(PARSED) { ${parsed} }')
 		println('(FORMAT) { \n${frontend.format_code_from_ast(parsed)}\n }')
@@ -43,13 +44,12 @@ fn main() {
 		println('error: could not run file - ${err}')
 		exit(1)
 	}
+	println('memory: ${state.memory}')
 	*/
 
-	// state.print()
-
 	// Call the code generator
-	generators.generator_call_backend("cgen", generators.CodeGenInterfaceOptions{
-		output_file: "out.c"
+	generators.generator_call_backend('cgen', generators.CodeGenInterfaceOptions{
+		output_file: 'out.c'
 		custom_arguments: {}
 		il: intermediate_code
 		ast: parsed

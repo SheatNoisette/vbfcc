@@ -4,9 +4,9 @@ import middle
 import os
 
 pub struct ILInterpreterOptions {
-	memory_size  int  // The size of the memory
-	print_direct bool // If true, print the output of the program directly to stdout
-	dynamic_memory  bool   // If true, the memory will be dynamically allocated
+	memory_size    int  // The size of the memory
+	print_direct   bool // If true, print the output of the program directly to stdout
+	dynamic_memory bool // If true, the memory will be dynamically allocated
 }
 
 [heap]
