@@ -11,6 +11,7 @@ vbfcc
 # Ignore binary output folders
 bin/
 out
+out.c
 
 # Ignore common editor/system specific metadata
 .DS_Store

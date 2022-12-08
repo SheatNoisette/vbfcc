@@ -68,24 +68,25 @@ pub fn run(code []middle.BFILToken, options ILInterpreterOptions) ?ILInterpreter
 		match code[state.program_counter].type_token {
 			.move_left {
 				if state.pointer == 0 {
-					return error('Pointer out of bounds')
+					state.print_state()
+					return error('(move_left) Pointer out of bounds')
 				}
-				state.pointer--
+				state.pointer -= u64(code[state.program_counter].value)
 			}
 			.move_right {
-				if state.pointer >= u64(options.memory_size) {
-					error('Error: pointer out of bounds')
+				if state.pointer >= u64(options.memory_size) && !options.dynamic_memory {
+					error('(move_right) Pointer out of bounds')
 				}
 				if state.pointer == u64(state.memory.len) - 1 {
 					state.memory << 0
 				}
-				state.pointer++
+				state.pointer += u64(code[state.program_counter].value)
 			}
 			.add {
-				state.memory[state.pointer]++
+				state.memory[state.pointer]+= u8(code[state.program_counter].value)
 			}
 			.sub {
-				state.memory[state.pointer]--
+				state.memory[state.pointer]-= u8(code[state.program_counter].value)
 			}
 			.output {
 				state.output += state.memory[state.pointer].ascii_str()
@@ -100,12 +101,12 @@ pub fn run(code []middle.BFILToken, options ILInterpreterOptions) ?ILInterpreter
 			}
 			.jump_if_zero {
 				if state.memory[state.pointer] == 0 {
-					state.program_counter = u64(code[state.program_counter].value) + 1
+					state.program_counter = u8(code[state.program_counter].value) + 1
 				}
 			}
 			.jump_if_not_zero {
 				if state.memory[state.pointer] != 0 {
-					state.program_counter = u64(code[state.program_counter].value) - 1
+					state.program_counter = u8(code[state.program_counter].value) - 1
 				}
 			}
 			else {}

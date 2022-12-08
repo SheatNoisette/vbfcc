@@ -58,6 +58,21 @@ fn (mut l LexerTokenList) pop() LexerToken {
 	return element
 }
 
+// Format a token into a string, bypassing the default V formatting
+fn (l LexerToken) str() string {
+	return "{$l.token_type $l.line:$l.column}"
+}
+
+// Print a list of tokens
+pub fn (l LexerTokenList) str() string {
+	mut output := '{'
+	for tok in l.tokens {
+		output += " " + tok.str() + '\n'
+	}
+	output += "}"
+	return output
+}
+
 // Lex a string into a list of tokens
 // input: The string to pass to the lexer
 pub fn lex_string(input string) LexerTokenList {

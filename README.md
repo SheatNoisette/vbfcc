@@ -2,14 +2,14 @@
 
 This is a simple Brainfuck compiler and interpreted written in V from scratch.
 
-It is not optimized and it is not meant to be. It's just a simple compiler made
-out of curiosity on my free time.
+**It is not optimized and it is not meant to be. It's just a simple compiler
+made out of curiosity on my free time.**
 
 A lot of things can be improved, but I'm not planning to do it. I'm just sharing
-it in case someone wants to use it as a reference. A lot of things can be
+it in case someone wants to use it as a reference. A lot of things can be better
 optimized and rewritten in a better way.
 
-Support:
+Supports:
 - Code generation
   - C
 - Basic optimizations
@@ -39,6 +39,16 @@ $ strip vbfcc
 For usage information, run the following command:
 ```bash
 $ ./vbfcc help
+```
+
+Compile a Brainfuck file to optimized C (default):
+```bash
+$ ./vbfcc build -opt hello.bf hello.c
+```
+
+Run a Brainfuck file:
+```bash
+$ ./vbfcc run hello.bf
 ```
 
 ## License

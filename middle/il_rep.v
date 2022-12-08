@@ -67,6 +67,11 @@ pub fn string_il(bf []BFILToken) string {
 	return s
 }
 
+// String representation of a BFILToken
+pub fn (t BFILToken) str() string {
+	return '{${t.type_token}, id: ${t.id}, value: ${t.value} / \'${t.value_str}\'}'
+}
+
 // Translate a Ast into a list of BFILToken
 pub fn gen_il(ast []&frontend.BrainfuckASTNode) []BFILToken {
 	mut tokens := []BFILToken{}

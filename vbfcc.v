@@ -25,7 +25,7 @@ fn get_version() string {
 }
 
 // Build the intermediate code for use in the interpreter or code generator
-fn build_ir(file_path string, optimize_il bool) ![]middle.BFILToken {
+fn build_ir(file_path string, optimize_il bool, debug bool) ![]middle.BFILToken {
 	// Load the file
 	file := os.read_file(file_path) or {
 		println('error: could not read file: ${err}')
@@ -35,18 +35,49 @@ fn build_ir(file_path string, optimize_il bool) ![]middle.BFILToken {
 	// Run the lexer
 	mut lex := frontend.lex_string(file)
 
+	// If requested, print the lexer output
+	if debug {
+		eprintln('(lexer) Generated tokens:')
+		eprintln(lex.str())
+		eprintln('(lexer) -- End of tokens --')
+	}
+
 	// Generate a cleaned up AST
 	mut parsed := frontend.parse(mut lex) or {
-		println('error: could not parse file - ${err}')
+		eprintln('error: could not parse file - ${err}')
 		exit(1)
+	}
+
+	if debug {
+		eprintln('(parser) Generated AST:')
+		for node in parsed {
+			eprintln(node)
+		}
+		eprintln('(parser) -- End of AST-- ')
 	}
 
 	// Generate the intermediate code
 	mut intermediate_code := middle.gen_il(parsed)
 
+	if debug {
+		eprintln('(il) Generated IL:')
+		for token in intermediate_code {
+			eprintln(token)
+		}
+		eprintln('(il) -- End of IL --')
+	}
+
 	// If requested, optimize the intermediate code
 	if optimize_il {
 		middle.optimize_il(mut intermediate_code)
+
+		if debug {
+			eprintln('(il) Optimized IL:')
+			for token in intermediate_code {
+				eprintln(token)
+			}
+			eprintln('(il) -- End of IL --')
+		}
 	}
 
 	return intermediate_code
@@ -57,26 +88,26 @@ fn run_interpreter(cmd Command) ! {
 	file_path := cmd.args[0]
 
 	memory_size := cmd.flags.get_int('memorysize') or {
-		println('error: invalid memory size (${err})')
+		eprintln('error: invalid memory size (${err})')
 		exit(1)
 	}
 	dynamic_memory := cmd.flags.get_bool('dynamicmem') or {
-		println('error: invalid dynamic memory flag (${err})')
+		eprintln('error: invalid dynamic memory flag (${err})')
 		exit(1)
 	}
 	debug_mode := cmd.flags.get_bool('debug') or {
-		println('error: invalid debug flag (${err})')
+		eprintln('error: invalid debug flag (${err})')
 		exit(1)
 	}
 	optimize_il := cmd.flags.get_bool('optimize') or {
-		println('error: invalid optimize flag (${err})')
+		eprintln('error: invalid optimize flag (${err})')
 		exit(1)
 	}
 
 	// Build the intermediate code
-	intermediate_code := build_ir(file_path, optimize_il) or {
-		println('error: could not build intermediate code:')
-		println(err)
+	intermediate_code := build_ir(file_path, optimize_il, debug_mode) or {
+		eprintln('error: could not build intermediate code:')
+		eprintln(err)
 		exit(1)
 	}
 
@@ -86,14 +117,14 @@ fn run_interpreter(cmd Command) ! {
 		print_direct: true
 		dynamic_memory: dynamic_memory
 	}) or {
-		println('error: could not run file - ${err}')
+		eprintln('error: could not run file - ${err}')
 		exit(1)
 	}
 
 	// Print the state if debug mode is enabled
 	if debug_mode {
-		println('memory pointer: ${state.pointer}')
-		println('memory: ${state.memory}')
+		eprintln('memory pointer: ${state.pointer}')
+		eprintln('memory: ${state.memory}')
 	}
 }
 
@@ -103,17 +134,22 @@ fn compile_file(cmd Command) ! {
 	file_path := cmd.args[0]
 
 	optimize := cmd.flags.get_bool('optimize') or {
-		println('error: invalid optimize flag (${err})')
+		eprintln('error: invalid optimize flag (${err})')
 		exit(1)
 	}
 
 	backend := cmd.flags.get_string('backend') or {
-		println('error: invalid backend flag (${err})')
+		eprintln('error: invalid backend flag (${err})')
 		exit(1)
 	}
 
 	stdout := cmd.flags.get_bool('stdout') or {
-		println('error: invalid stdout flag (${err})')
+		eprintln('error: invalid stdout flag (${err})')
+		exit(1)
+	}
+
+	debug := cmd.flags.get_bool('debug') or {
+		println('error: invalid debug flag (${err})')
 		exit(1)
 	}
 
@@ -126,21 +162,21 @@ fn compile_file(cmd Command) ! {
 			cmd.args[1]
 		}
 		else {
-			println('error: too many arguments (got ${cmd.flags.len})')
+			eprintln('error: too many arguments (got ${cmd.flags.len})')
 			exit(1)
 		}
 	}
 
 	// Sanity check of commands
 	if output_file != vbfcc_output_file && stdout {
-		println('error: cannot output to both file and stdout')
+		eprintln('error: cannot output to both file and stdout')
 		exit(1)
 	}
 
 	// Build the intermediate code
-	intermediate_code := build_ir(file_path, optimize) or {
-		println('error: could not build intermediate code:')
-		println(err)
+	intermediate_code := build_ir(file_path, optimize, debug) or {
+		eprintln('error: could not build intermediate code:')
+		eprintln(err)
 		exit(1)
 	}
 
@@ -152,7 +188,7 @@ fn compile_file(cmd Command) ! {
 		optimize: optimize
 		il: intermediate_code
 	}) or {
-		println('error: could not generate code - ${err}')
+		eprintln('error: could not generate code - ${err}')
 		exit(1)
 	}
 }
@@ -229,6 +265,13 @@ fn main() {
 		name: 'stdout'
 		default_value: ['false']
 		description: 'Print the output to stdout instead of a file'
+	})
+	compile.add_flag(Flag{
+		flag: .bool
+		name: 'debug'
+		abbrev: 'd'
+		default_value: ['false']
+		description: 'Debug output'
 	})
 
 	cmd.add_command(interpreter)
