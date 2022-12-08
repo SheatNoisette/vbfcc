@@ -1,6 +1,8 @@
 module frontend
 
-// Simple clang format like for brainfuck
+/*
+**Simple clang-format like for BrainFuck
+*/
 
 // Format brainfuck code
 pub fn format_code_from_ast(ast []&BrainfuckASTNode) string {

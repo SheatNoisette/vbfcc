@@ -4,6 +4,7 @@ import frontend
 
 // Generate the intermediate code for a bf program
 
+// Every token is a instruction
 pub enum BFILTokenType {
 	add
 	sub
@@ -16,12 +17,13 @@ pub enum BFILTokenType {
 	exit
 }
 
+//
 pub struct BFILToken {
 pub:
-	type_token BFILTokenType
-	id         int
-	value      int
-	value_str  string
+	type_token BFILTokenType // The type of the token
+	id         int    // Internal id
+	value      int    // The value of the token
+	value_str  string // The value of the token as a string (if needed)
 }
 
 // Pretty print the BFILToken list into a string

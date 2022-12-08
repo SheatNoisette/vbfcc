@@ -3,12 +3,14 @@ module interpreter
 import middle
 import os
 
+// Options for the interpreter
 pub struct ILInterpreterOptions {
 	memory_size    int  // The size of the memory
 	print_direct   bool // If true, print the output of the program directly to stdout
 	dynamic_memory bool // If true, the memory will be dynamically allocated
 }
 
+// This represent the state of the program
 [heap]
 pub struct ILInterpreterState {
 pub mut:
@@ -61,6 +63,7 @@ pub fn run(code []middle.BFILToken, options ILInterpreterOptions) ?ILInterpreter
 		}
 	}
 
+	// For each token, we execute the corresponding instruction
 	for code[state.program_counter].type_token != middle.BFILTokenType.exit {
 		match code[state.program_counter].type_token {
 			.move_left {
@@ -91,6 +94,7 @@ pub fn run(code []middle.BFILToken, options ILInterpreterOptions) ?ILInterpreter
 				}
 			}
 			.input {
+				// TODO: Better input handling
 				input := os.get_line()[0].ascii_str()
 				state.memory[state.pointer] = u8(input[0])
 			}

@@ -1,7 +1,5 @@
 module middle
 
-import frontend
-
 // Simplify add and sub instructions.
 // add, add, add -> add 3
 // sub, sub, sub -> sub 3

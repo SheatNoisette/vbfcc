@@ -11,6 +11,8 @@ pub enum LexerTokenType {
 	input // ,
 	jump_past // [
 	jump_back // ]
+	comment // Other characters
+	line_return // \n
 }
 
 // A token is a single character in the source code
@@ -27,6 +29,7 @@ mut:
 	tokens []LexerToken
 }
 
+// Add a token to the list
 fn (mut l LexerTokenList) add(token LexerTokenType, line int, column int) {
 	l.tokens << LexerToken{
 		token_type: token
@@ -35,14 +38,18 @@ fn (mut l LexerTokenList) add(token LexerTokenType, line int, column int) {
 	}
 }
 
+// Get an element from the list
 fn (l LexerTokenList) get(index int) LexerToken {
 	return l.tokens[index]
 }
 
+// Get the length of the list
+// This is a synonym for LexerTokenList.tokens.len
 fn (l LexerTokenList) len() int {
 	return l.tokens.len
 }
 
+// Pop the first element of the list
 fn (mut l LexerTokenList) pop() LexerToken {
 	// Remove first element
 	element := l.tokens[0]
@@ -51,6 +58,8 @@ fn (mut l LexerTokenList) pop() LexerToken {
 	return element
 }
 
+// Lex a string into a list of tokens
+// input: The string to pass to the lexer
 pub fn lex_string(input string) LexerTokenList {
 	mut tokens := LexerTokenList{}
 	mut current_line := 1
@@ -84,10 +93,12 @@ pub fn lex_string(input string) LexerTokenList {
 				tokens.add(LexerTokenType.jump_back, current_line, current_column)
 			}
 			`\n` {
+				tokens.add(LexerTokenType.line_return, current_line, current_column)
 				current_line++
 				current_column = 0
 			}
 			else {
+				tokens.add(LexerTokenType.comment, current_line, current_column)
 				current_column++
 			}
 		}
