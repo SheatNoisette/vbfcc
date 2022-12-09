@@ -1,7 +1,5 @@
 module generators
 
-import os
-
 /*
 ** C99 Generator (Accidentally works with C89 too)
 */
@@ -55,16 +53,8 @@ fn (cgen CGenBackend) generate_code(options CodeGenInterfaceOptions) ? {
 
 	output += generators.cgen_postlude_c99.to_string()
 
-	if options.print_stdout {
-		println(output)
-	}
-
-	// Save to a file
-	if !options.print_stdout {
-		mut f := os.create(options.output_file) or {
-			return error('Could not create file ${options.output_file}')
-		}
-		f.write_string(output) or { return error('Could not write to file ${options.output_file}') }
-		f.close()
+	// Write the file
+	write_code_to_single_file_or_stdout(output, options.output_file, options.print_stdout) or {
+		return error('Failed to write code to file')
 	}
 }

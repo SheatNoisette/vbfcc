@@ -83,10 +83,10 @@ pub fn run(code []middle.BFILToken, options ILInterpreterOptions) ?ILInterpreter
 				state.pointer += u64(code[state.program_counter].value)
 			}
 			.add {
-				state.memory[state.pointer]+= u8(code[state.program_counter].value)
+				state.memory[state.pointer] += u8(code[state.program_counter].value)
 			}
 			.sub {
-				state.memory[state.pointer]-= u8(code[state.program_counter].value)
+				state.memory[state.pointer] -= u8(code[state.program_counter].value)
 			}
 			.output {
 				state.output += state.memory[state.pointer].ascii_str()
