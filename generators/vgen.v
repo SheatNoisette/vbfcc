@@ -18,39 +18,40 @@ fn (cgen VGenBackend) generate_code(options CodeGenInterfaceOptions) ? {
 
 	// Add prelude
 	output += generators.vgen_prelude.to_string()
+	mut indent := 1
 
 	for tok in options.il {
-		output += match tok.type_token {
+		output += indent_str('\t', indent, match tok.type_token {
 			.move_right {
-				'\tptr += ${tok.value}'
+				'ptr += ${tok.value}'
 			}
 			.move_left {
-				'\tptr -= ${tok.value}'
+				'ptr -= ${tok.value}'
 			}
 			.add {
-				'\tmemory[ptr] += ${tok.value}'
+				'memory[ptr] += ${tok.value}'
 			}
 			.sub {
-				'\tmemory[ptr] -= ${tok.value}'
+				'memory[ptr] -= ${tok.value}'
 			}
 			.exit {
-				''
+				'exit(0)'
 			}
 			.jump_if_zero {
-				// 'label_${tok.id}:\n\tif (memory[ptr] == 0) goto label_${tok.value};'
-				'\tfor memory[ptr] != 0 {'
+				indent++
+				'for memory[ptr] != 0 {'
 			}
 			.jump_if_not_zero {
-				// '\tif (memory[ptr] != 0) goto label_${tok.value};\nlabel_${tok.id}:'
+				indent--
 				'}'
 			}
 			.input {
-				'\tmemory[ptr] = os.get_line()[0]'
+				'memory[ptr] = os.get_line()[0]'
 			}
 			.output {
-				'\tprint(memory[ptr].ascii_str())'
+				'print(memory[ptr].ascii_str())'
 			}
-		} + '\n'
+		}) + '\n'
 	}
 
 	// Add postlude
