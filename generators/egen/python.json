@@ -1,17 +1,20 @@
 {
-	"name": ["py", "python"],
+	"name": [
+		"py",
+		"python"
+	],
 	"version": "0.1.0",
 	"author": "SheatNoisette",
 	"license": "MIT",
-    "description": "Python Code generator",
-    "indent_type": "\t",
-    "indent_begin": 1,
+	"description": "Python Code generator",
+	"indent_type": "\t",
+	"indent_begin": 1,
 	"file_extension": "py",
 	"prelude": "@VARIABLES\ndef main():\n\tglobal pointer\n\tglobal memory\n",
 	"postlude": "main()",
 	"function_prelude": "def bf_fnc():\n",
 	"function_postlude": "",
-    "variables": "pointer = 0\nmemory = [0] * 256\n",
+	"variables": "pointer = 0\nmemory = [0] * 256\n",
 	"tokens": {
 		"move_right": "@INDENTpointer += @TOKENVALUE\n",
 		"move_left": "@INDENTpointer -= @TOKENVALUE\n",
