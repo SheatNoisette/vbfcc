@@ -153,6 +153,23 @@ fn compile_file(cmd Command) ! {
 		exit(1)
 	}
 
+	// Memory size
+	memory_size := cmd.flags.get_int('memorysize') or {
+		eprintln('error: invalid memory size (${err})')
+		exit(1)
+	}
+
+	// Export the functio
+	export := cmd.flags.get_bool('export') or {
+		eprintln('error: invalid export flag (${err})')
+		exit(1)
+	}
+
+	custom_arguments := cmd.flags.get_string('custom') or {
+		eprintln('error: invalid custom arguments (${err})')
+		exit(1)
+	}
+
 	// Get the output file
 	output_file := match cmd.args.len {
 		1 {
@@ -183,10 +200,12 @@ fn compile_file(cmd Command) ! {
 	// Call the code generator
 	generators.generator_call_backend(backend, generators.CodeGenInterfaceOptions{
 		output_file: output_file
-		custom_arguments: {}
+		custom_arguments: custom_arguments.split(' ')
 		print_stdout: stdout
 		optimize: optimize
 		il: intermediate_code
+		memory_size: memory_size
+		generate_function: export
 	}) or {
 		eprintln('error: could not generate code - ${err}')
 		exit(1)
@@ -272,6 +291,27 @@ fn main() {
 		abbrev: 'd'
 		default_value: ['false']
 		description: 'Debug output'
+	})
+	compile.add_flag(Flag{
+		flag: .string
+		name: 'custom'
+		abbrev: 'c'
+		default_value: ['']
+		description: 'Custom arguments for the backend (format: -flag value, ...)'
+	})
+	compile.add_flag(Flag{
+		flag: .int
+		name: 'memorysize'
+		abbrev: 'm'
+		default_value: ['256']
+		description: 'The size of the memory array'
+	})
+	compile.add_flag(Flag{
+		flag: .bool
+		name: 'export'
+		abbrev: 'e'
+		default_value: ['false']
+		description: 'Export the code in a function instead of a main function'
 	})
 
 	cmd.add_command(interpreter)

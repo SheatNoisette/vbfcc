@@ -1,0 +1,24 @@
+{
+	"name": ["c++", "cplusplus"],
+	"version": "0.1.0",
+	"author": "SheatNoisette",
+	"license": "MIT",
+    "description": "C++ code generator which is barely tested",
+	"file_extension": "cpp",
+	"prelude": "/*\n@AUTHOR\n Licensed under @LICENSE\n @VERSION\n*/\n#include <iostream>\n\nint main() {\n@VARIABLES",
+	"postlude": "}",
+	"function_prelude": "int bf_fnc() {\n@VARIABLES",
+	"function_postlude": "}",
+    "variables": "char memory[@MEMORYSIZE];\nint ptr = 0;\n",
+	"tokens": {
+		"move_right": "\tptr += @TOKENVALUE;\n",
+		"move_left": "\tptr -= @TOKENVALUE;\n",
+		"add": "\tmemory[ptr] += @TOKENVALUE;\n",
+		"sub": "\tmemory[ptr] -= @TOKENVALUE;\n",
+		"exit": "\treturn 0;\n",
+		"input": "\tmemory[ptr] = getchar();\n",
+		"output": "\tputchar(memory[ptr]);\n",
+		"jump_if_zero": "\twhile (memory[ptr]) { /* @TOKENVALUE @TOKENID */\n",
+		"jump_if_not_zero": "\t}\n"
+	}
+}
