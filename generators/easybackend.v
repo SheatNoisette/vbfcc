@@ -42,6 +42,8 @@ struct EasyBackendJson {
 	author            string            [required]
 	variables         string
 	license           string            [required]
+	indent_begin      int 			 [required]
+	indent_type 	  string            [required]
 	file_extension    string            [required]
 	prelude           string            [required]
 	postlude          string            [required]
@@ -68,23 +70,30 @@ fn replace_simple_tokens(input string, content EasyBackendJson, options CodeGenI
 }
 
 // Replace element token
-fn replace_element_token(input string, token_value int, token_id int) string {
+fn replace_element_token(input string, indent int, token middle.BFILToken, options EasyBackendJson) string {
 	mut output := input
-	output = output.replace('@TOKENID', token_id.str())
-	output = output.replace('@TOKENVALUE', token_value.str())
+	output = output.replace('@TOKENID', token.id.str())
+	output = output.replace('@TOKENVALUE', token.value.str())
+	output = output.replace('@INDENTVAL', indent.str())
+	output = output.replace('@INDENT', options.indent_type.repeat(indent))
+	output = output.replace('@POSTINDENT', options.indent_type.repeat(match indent {
+		0 { 0 }
+		else { indent - 1 }
+	}))
 	return output
 }
 
 // From a token, get the string representation fron the json
-fn get_token_from_json(content EasyBackendJson, token middle.BFILToken) string {
+fn get_token_from_json(indent int, content EasyBackendJson, token middle.BFILToken) string {
 	// Get the line from the json
 	json_str := content.tokens[generators.vbfcc_il_to_string[token.type_token]]
 	// Replace the token value
-	return replace_element_token(json_str, token.value, token.id)
+	return replace_element_token(json_str, indent, token, content)
 }
 
 fn generate_from_json(content EasyBackendJson, options CodeGenInterfaceOptions) string {
 	mut output := ''
+	mut indent := content.indent_begin
 
 	// Generate prelude
 	if options.generate_function {
@@ -96,7 +105,12 @@ fn generate_from_json(content EasyBackendJson, options CodeGenInterfaceOptions) 
 	// Generate code
 	// Il -> Json -> Replace variables -> Append to output
 	for tok in options.il {
-		output += get_token_from_json(content, tok)
+		indent = match tok.type_token {
+			.jump_if_zero { indent + 1 }
+			.jump_if_not_zero { indent - 1 }
+			else { indent }
+		}
+		output += get_token_from_json(indent, content, tok)
 	}
 
 	// Generate postlude
