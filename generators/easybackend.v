@@ -1,7 +1,6 @@
 module generators
 
 import middle
-
 import json
 
 /*
@@ -11,26 +10,26 @@ import json
 
 const (
 	vbfcc_string_to_il = {
-		"move_right": middle.BFILTokenType.move_right,
-		"move_left": middle.BFILTokenType.move_left,
-		"add": middle.BFILTokenType.add,
-		"sub": middle.BFILTokenType.sub,
-		"exit": middle.BFILTokenType.exit,
-		"input": middle.BFILTokenType.input,
-		"output": middle.BFILTokenType.output,
-		"jump_if_zero": middle.BFILTokenType.jump_if_zero,
-		"jump_if_not_zero": middle.BFILTokenType.jump_if_not_zero
+		'move_right':       middle.BFILTokenType.move_right
+		'move_left':        middle.BFILTokenType.move_left
+		'add':              middle.BFILTokenType.add
+		'sub':              middle.BFILTokenType.sub
+		'exit':             middle.BFILTokenType.exit
+		'input':            middle.BFILTokenType.input
+		'output':           middle.BFILTokenType.output
+		'jump_if_zero':     middle.BFILTokenType.jump_if_zero
+		'jump_if_not_zero': middle.BFILTokenType.jump_if_not_zero
 	}
 	vbfcc_il_to_string = {
-		middle.BFILTokenType.move_right: "move_right",
-		middle.BFILTokenType.move_left: "move_left",
-		middle.BFILTokenType.add: "add",
-		middle.BFILTokenType.sub: "sub",
-		middle.BFILTokenType.exit: "exit",
-		middle.BFILTokenType.input: "input",
-		middle.BFILTokenType.output: "output",
-		middle.BFILTokenType.jump_if_zero: "jump_if_zero",
-		middle.BFILTokenType.jump_if_not_zero: "jump_if_not_zero"
+		middle.BFILTokenType.move_right:       'move_right'
+		middle.BFILTokenType.move_left:        'move_left'
+		middle.BFILTokenType.add:              'add'
+		middle.BFILTokenType.sub:              'sub'
+		middle.BFILTokenType.exit:             'exit'
+		middle.BFILTokenType.input:            'input'
+		middle.BFILTokenType.output:           'output'
+		middle.BFILTokenType.jump_if_zero:     'jump_if_zero'
+		middle.BFILTokenType.jump_if_not_zero: 'jump_if_not_zero'
 	}
 )
 
@@ -73,7 +72,7 @@ fn replace_element_token(input string, token_value int, token_id int) string {
 // From a token, get the string representation fron the json
 fn get_token_from_json(content EasyBackendJson, token middle.BFILToken) string {
 	// Get the line from the json
-	json_str := content.tokens[vbfcc_il_to_string[token.type_token]]
+	json_str := content.tokens[generators.vbfcc_il_to_string[token.type_token]]
 	// Replace the token value
 	return replace_element_token(json_str, token.value, token.id)
 }
@@ -89,6 +88,7 @@ fn generate_from_json(content EasyBackendJson, options CodeGenInterfaceOptions) 
 	}
 
 	// Generate code
+	// Il -> Json -> Replace variables -> Append to output
 	for tok in options.il {
 		output += get_token_from_json(content, tok)
 	}
@@ -107,5 +107,14 @@ fn (backend EasyBackend) generate_code(json_input string, options CodeGenInterfa
 	// Deserialize json
 	content := json.decode(EasyBackendJson, json_input) or { return error('Invalid json') }
 	output := generate_from_json(content, options)
-	write_code_to_single_file_or_stdout(output, options.output_file, options.print_stdout) or { return error('Failed to write code') }
+	write_code_to_single_file_or_stdout(output, options.output_file, options.print_stdout) or {
+		return error('Failed to write code')
+	}
+}
+
+fn (backend EasyBackend) generate_code_from_file(json_file string, options CodeGenInterfaceOptions) ? {
+	// Read json file
+	json_input := os.read_file(json_file) or { return error('Failed to read json file') }
+	// Generate code
+	backend.generate_code(json_input, options) or { return error('Failed to generate code') }
 }
