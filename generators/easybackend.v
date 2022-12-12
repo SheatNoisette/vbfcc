@@ -2,6 +2,7 @@ module generators
 
 import middle
 import json
+import os
 
 /*
 ** Load JSON file and to generate code
@@ -33,13 +34,13 @@ const (
 	}
 )
 
-struct EasyBackend {}
-
 // Json mapping
 struct EasyBackendJson {
 	name              []string          [required]
 	version           string
+	description       string            [required]
 	author            string            [required]
+	variables         string
 	license           string            [required]
 	file_extension    string            [required]
 	prelude           string            [required]
@@ -53,11 +54,16 @@ struct EasyBackendJson {
 // - @AUTHOR
 // - @VERSION
 // - @LICENSE
-fn replace_simple_tokens(input string, content EasyBackendJson) string {
+fn replace_simple_tokens(input string, content EasyBackendJson, options CodeGenInterfaceOptions) string {
 	mut output := input
 	output = output.replace('@AUTHOR', content.author)
 	output = output.replace('@VERSION', content.version)
 	output = output.replace('@LICENSE', content.license)
+	output = output.replace('@DESCRIPTION', content.description)
+	output = output.replace('@VARIABLES', content.variables)
+	output = output.replace('@FILENAME', options.output_file)
+	output = output.replace('@EXTENSION', content.file_extension)
+	output = output.replace('@MEMORYSIZE', options.memory_size.str())
 	return output
 }
 
@@ -82,9 +88,9 @@ fn generate_from_json(content EasyBackendJson, options CodeGenInterfaceOptions) 
 
 	// Generate prelude
 	if options.generate_function {
-		output += replace_simple_tokens(content.function_prelude, content)
+		output += replace_simple_tokens(content.function_prelude, content, options)
 	} else {
-		output += replace_simple_tokens(content.prelude, content)
+		output += replace_simple_tokens(content.prelude, content, options)
 	}
 
 	// Generate code
@@ -95,15 +101,15 @@ fn generate_from_json(content EasyBackendJson, options CodeGenInterfaceOptions) 
 
 	// Generate postlude
 	if options.generate_function {
-		output += replace_simple_tokens(content.function_postlude, content)
+		output += replace_simple_tokens(content.function_postlude, content, options)
 	} else {
-		output += replace_simple_tokens(content.postlude, content)
+		output += replace_simple_tokens(content.postlude, content, options)
 	}
 
 	return output
 }
 
-fn (backend EasyBackend) generate_code(json_input string, options CodeGenInterfaceOptions) ? {
+fn egen_generate_code(json_input string, options CodeGenInterfaceOptions) ? {
 	// Deserialize json
 	content := json.decode(EasyBackendJson, json_input) or { return error('Invalid json') }
 	output := generate_from_json(content, options)
@@ -112,9 +118,9 @@ fn (backend EasyBackend) generate_code(json_input string, options CodeGenInterfa
 	}
 }
 
-fn (backend EasyBackend) generate_code_from_file(json_file string, options CodeGenInterfaceOptions) ? {
+fn egen_generate_code_from_file(json_file string, options CodeGenInterfaceOptions) ? {
 	// Read json file
 	json_input := os.read_file(json_file) or { return error('Failed to read json file') }
 	// Generate code
-	backend.generate_code(json_input, options) or { return error('Failed to generate code') }
+	egen_generate_code(json_input, options) or { return error('Failed to generate code') }
 }
