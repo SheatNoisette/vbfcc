@@ -52,6 +52,8 @@ pub fn generator_call_backend(backend_name string, options CodeGenInterfaceOptio
 
 	// Every EasyGen backend is registered here
 	dp.register_egen_backend('cpp', $embed_file('generators/egen/cpp.json').to_string())
+	dp.register_egen_backend('py', $embed_file('generators/egen/python.json').to_string())
+	dp.register_egen_backend('js', $embed_file('generators/egen/nodejs.json').to_string())
 
 	// Check backends
 	match backend_name {

@@ -14,12 +14,17 @@ optimized and rewritten in a better way.
 Supports:
 - Code generation
   - C
+  - Python
+  - Vlang
+  - NodeJS Javascript Flavour
 - Basic optimizations
 - Integrated interpreter
 
 Missing:
 - Tests
 - JIT
+- More optimizations
+- Contextual optimizations
 
 ## Building
 

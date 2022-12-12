@@ -1,0 +1,26 @@
+{
+	"name": ["nodejs", "njs"],
+	"version": "0.1.0",
+	"author": "SheatNoisette",
+	"license": "MIT",
+    "description": "JS for NodeJS code generator",
+    "indent_type": "  ",
+    "indent_begin": 1,
+	"file_extension": "js",
+	"prelude": "@VARIABLES\nfunction main() {\n",
+	"postlude": "}\nmain();",
+	"function_prelude": "@VARIABLES\nfunction bf_fnc() {\n",
+	"function_postlude": "}",
+    "variables": "var pointer = 0;\nvar memory = [];\nfor (var i = 0; i < @MEMORYSIZE; i++) {\n\tmemory[i] = 0;\n}",
+	"tokens": {
+		"move_right": "@INDENTpointer += @TOKENVALUE;\n",
+		"move_left": "@INDENTpointer -= @TOKENVALUE;\n",
+		"add": "@INDENTmemory[pointer] += @TOKENVALUE;\n",
+		"sub": "@INDENTmemory[pointer] -= @TOKENVALUE;\n",
+		"exit": "@INDENTreturn memory[pointer];\n",
+		"input": "@INDENTmemory[pointer] = parseInt(readline());\n",
+		"output": "@INDENTprocess.stdout.write(String.fromCharCode(memory[pointer]));\n",
+		"jump_if_zero": "@POSTINDENTwhile (memory[pointer] != 0) {\n",
+		"jump_if_not_zero": "@INDENT}\n"
+	}
+}

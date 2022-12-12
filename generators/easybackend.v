@@ -42,8 +42,8 @@ struct EasyBackendJson {
 	author            string            [required]
 	variables         string
 	license           string            [required]
-	indent_begin      int 			 [required]
-	indent_type 	  string            [required]
+	indent_begin      int               [required]
+	indent_type       string            [required]
 	file_extension    string            [required]
 	prelude           string            [required]
 	postlude          string            [required]
