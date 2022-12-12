@@ -1,0 +1,27 @@
+name: build
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - name: Install V, git and GCC
+      run: |
+        sudo apt install -y git gcc clang libgc-dev
+        git clone --depth 1 https://github.com/vlang/v.git ~/v
+        (cd ~/v;make -j 4;sudo ./v symlink)
+
+    - name: Build with GCC
+      run: v -skip-unused -prod -gc none -cc gcc .
+
+    - name: Build with TCC
+      run: v -skip-unused -prod -gc none .
