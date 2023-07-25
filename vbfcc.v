@@ -221,35 +221,35 @@ fn main() {
 	}
 
 	// Interpreter command
-	mut interpreter := Command{
+	mut internal_interpreter := Command{
 		name: 'run'
 		description: 'Run a Brainfuck file from the integrated interpreter'
 		usage: '<file>'
 		required_args: 1
 		execute: run_interpreter
 	}
-	interpreter.add_flag(Flag{
+	internal_interpreter.add_flag(Flag{
 		flag: .bool
 		name: 'optimize'
 		abbrev: 'opt'
 		default_value: ['false']
 		description: 'Optimize the intermediate code before running'
 	})
-	interpreter.add_flag(Flag{
+	internal_interpreter.add_flag(Flag{
 		flag: .bool
 		name: 'debug'
 		abbrev: 'd'
 		default_value: ['false']
 		description: 'Print debug information'
 	})
-	interpreter.add_flag(Flag{
+	internal_interpreter.add_flag(Flag{
 		flag: .bool
 		name: 'dynamicmem'
 		abbrev: 'dm'
 		default_value: ['true']
 		description: 'Use dynamic memory allocation instead of a fixed size memory array'
 	})
-	interpreter.add_flag(Flag{
+	internal_interpreter.add_flag(Flag{
 		flag: .int
 		name: 'memorysize'
 		abbrev: 'ms'
@@ -314,7 +314,7 @@ fn main() {
 		description: 'Export the code in a function instead of a main function'
 	})
 
-	cmd.add_command(interpreter)
+	cmd.add_command(internal_interpreter)
 	cmd.add_command(compile)
 	cmd.setup()
 	cmd.parse(os.args)
