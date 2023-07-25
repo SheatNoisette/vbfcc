@@ -2,7 +2,7 @@
 
 ![build](https://github.com/SheatNoisette/vbfcc/actions/workflows/build.yml/badge.svg)
 
-This is a simple Brainfuck compiler and interpreted written in V from scratch.
+This is a simple Brainfuck compiler and interpreter written in V from scratch.
 
 **It is not optimized and it is not meant to be. It's just a simple compiler
 made out of curiosity on my free time.**
