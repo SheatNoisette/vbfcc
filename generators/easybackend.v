@@ -123,7 +123,7 @@ fn generate_from_json(content EasyBackendJson, options CodeGenInterfaceOptions) 
 	return output
 }
 
-fn egen_generate_code(json_input string, options CodeGenInterfaceOptions) ? {
+fn egen_generate_code(json_input string, options CodeGenInterfaceOptions) ! {
 	// Deserialize json
 	content := json.decode(EasyBackendJson, json_input) or { return error('Invalid json') }
 	output := generate_from_json(content, options)
@@ -132,7 +132,7 @@ fn egen_generate_code(json_input string, options CodeGenInterfaceOptions) ? {
 	}
 }
 
-fn egen_generate_code_from_file(json_file string, options CodeGenInterfaceOptions) ? {
+fn egen_generate_code_from_file(json_file string, options CodeGenInterfaceOptions) ! {
 	// Read json file
 	json_input := os.read_file(json_file) or { return error('Failed to read json file') }
 	// Generate code

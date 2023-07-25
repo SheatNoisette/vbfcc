@@ -37,7 +37,7 @@ fn (mut dp EasyGenBackendDispatch) str() string {
 }
 
 // Execute the EasyGen backend
-fn (mut dp EasyGenBackendDispatch) generate_code(backend string, options CodeGenInterfaceOptions) ? {
+fn (mut dp EasyGenBackendDispatch) generate_code(backend string, options CodeGenInterfaceOptions) ! {
 	if backend !in dp.backend_json {
 		eprintln('${dp}')
 		return error('Backend ${backend} not found')
@@ -46,7 +46,7 @@ fn (mut dp EasyGenBackendDispatch) generate_code(backend string, options CodeGen
 }
 
 // Dispatches the call to the correct backend
-pub fn generator_call_backend(backend_name string, options CodeGenInterfaceOptions) ? {
+pub fn generator_call_backend(backend_name string, options CodeGenInterfaceOptions) ! {
 	// Add the EasyGen backends
 	mut dp := EasyGenBackendDispatch{}
 

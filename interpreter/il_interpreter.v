@@ -41,7 +41,7 @@ pub fn (i ILInterpreterState) print_state() {
 }
 
 // Simple interpreter using the intermediate code generated
-pub fn run(code []middle.BFILToken, options ILInterpreterOptions) ?ILInterpreterState {
+pub fn run(code []middle.BFILToken, options ILInterpreterOptions) !ILInterpreterState {
 	mut state := ILInterpreterState{
 		pointer: 0
 		output: ''

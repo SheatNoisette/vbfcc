@@ -4,7 +4,7 @@ import os
 
 // Write code to a file
 // If stdout is true, the code will be printed to stdout
-fn write_code_to_single_file_or_stdout(code string, file string, stdout bool) ? {
+fn write_code_to_single_file_or_stdout(code string, file string, stdout bool) ! {
 	if stdout {
 		println(code)
 	} else {

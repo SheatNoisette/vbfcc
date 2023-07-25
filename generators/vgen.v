@@ -13,7 +13,7 @@ const (
 struct VGenBackend {}
 
 // Generate code for Brainfuck code
-fn (cgen VGenBackend) generate_code(options CodeGenInterfaceOptions) ? {
+fn (cgen VGenBackend) generate_code(options CodeGenInterfaceOptions) ! {
 	mut output := ''
 
 	// Add prelude
