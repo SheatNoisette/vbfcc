@@ -115,11 +115,15 @@ pub fn parse(mut tokens LexerTokenList) ![]&BrainfuckASTNode {
 		match node.get_type() {
 			// ]
 			.jump_back {
-				node.start_loop = nodes[loops_resolved[node.id]] or {}
+				node.start_loop = nodes[loops_resolved[node.id]] or {
+					return error('invalid Jump Back')
+				}
 			}
 			// [
 			.jump_past {
-				node.end_loop = nodes[loops_resolved[node.id]] or {}
+				node.end_loop = nodes[loops_resolved[node.id]] or {
+					return error('invalid Jump Past')
+				}
 			}
 			else {}
 		}
