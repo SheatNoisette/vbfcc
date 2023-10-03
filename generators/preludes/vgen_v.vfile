@@ -1,6 +1,6 @@
 module main
 
 fn main() {
-    mut memory := []u8{len: 255}
-    mut ptr := 0
+	mut memory := [255]u8{}
+	mut ptr := 0
 
